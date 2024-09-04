@@ -16,17 +16,17 @@ const registerUser = asyncHandler( async (req, res) => {
     // return response
 
 
-    const {fullName, username, email, password} = req.body;
+    const {fullName, userName, email, password} = req.body;
     console.log("email", email);
     
     if (
-        [fullName, username, email, password].some((field) => field?.trim() === "")
+        [fullName, userName, email, password].some((field) => field?.trim() === "")
     ) {
             throw new ApiError(400, "Please fill in all fields");
     }
 
-    const existedUser = User.findOne({
-        $or: [{ username }, { email }],
+    const existedUser = await User.findOne({
+        $or: [{ userName }, { email }],
     })
     
     if (existedUser) {
@@ -41,8 +41,8 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Please provide an avatar");
     }
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if (!avatar) {
         throw new ApiError(500, "avatar is required");
@@ -54,7 +54,7 @@ const registerUser = asyncHandler( async (req, res) => {
         coverImage: coverImage?.url || "",
         email,
         password,
-        username: username.toLowerCase(),
+        userName: userName.toLowerCase(),
     })
 
     const createdUser = await User.findById(user._id).select(
